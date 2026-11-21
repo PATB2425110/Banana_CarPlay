@@ -1,0 +1,97 @@
+{
+  "file": "AppleCarPlay-1.4.2-375-202611212038.apk",
+  "sha256": "1289D7E1A16A640151504F72F02445C1B9AC12B54E71AB727D8846CA57C8C6EA",
+  "bytes": 6177415,
+  "product": "Apple CarPlay",
+  "package": "io.dushu.car",
+  "versionName": "1.4.2",
+  "versionCode": 375,
+  "certificateSHA256": "30ded7ab47342f2b3a4746f42c37544cdd6ed181d1e257c37d3c3cc93756a97e",
+  "signatureSDK28": true,
+  "zipalign": true,
+  "tests": {
+    "tests": 2477,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "exportedSourceTests": {
+    "scope": "Sanitized public repository source, full eight-module rerun; not real-device visual acceptance",
+    "totals": {
+      "tests": 2477,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules": [
+      {
+        "module": "shared",
+        "tests": 469,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/api",
+        "tests": 153,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/core-bridge",
+        "tests": 1311,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/platform-android",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/platform-ecarx",
+        "tests": 62,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/platform-geely",
+        "tests": 291,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/ui",
+        "tests": 161,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "car/app",
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "result": "BUILD SUCCESSFUL in 43s",
+    "tasks": "182 actionable tasks: 182 executed",
+    "exitCode": 0
+  },
+  "sourceCommit": "f1a6b3301885d943ce5e1bc7179ead1cbadbdb6f",
+  "tag": "v1.4.2-375-202611212038",
+  "releaseBuild": "BUILD SUCCESSFUL in 59s",
+  "releaseTasks": "338 actionable tasks: 30 executed, 308 up-to-date",
+  "warning": "重要：请保持“读取车辆状态”关闭。当前车辆状态能力声明在已报告iPhone上会触发IdentificationRejected；本次仅调整UI，没有修复握手或自动兼容回退。用户已确认关闭后恢复连接。",
+  "vehicleStatusHandshakeFixIncluded": false,
+  "shieldProtected": false,
+  "installed": false,
+  "visualAndVehicleAcceptance": false
+}
