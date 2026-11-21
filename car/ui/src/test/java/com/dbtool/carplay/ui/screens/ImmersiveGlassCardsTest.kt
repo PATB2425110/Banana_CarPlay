@@ -8,9 +8,11 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ImmersiveGlassCardsTest {
-    @Test fun arrowOnlyOffsetAndLeftCoverDoNotChangeExistingCardAndControlGeometry() {
+    @Test fun bottomAlignedArrowKeepsItsSizeHorizontalPositionAndMusicControls() {
         assertEquals(-15f, ImmersiveGlassCardLayout.ARROW_OFFSET_X, 0f)
-        assertEquals(-20f, ImmersiveGlassCardLayout.ARROW_OFFSET_Y, 0f)
+        assertEquals(50f, ImmersiveGlassCardLayout.ARROW_LEFT, 0f)
+        assertEquals(110, ImmersiveGlassCardLayout.ARROW_SIZE)
+        assertEquals(136f, ImmersiveGlassCardLayout.ROAD_BASELINE, 0f)
         assertEquals(-15f, ImmersiveGlassCardLayout.INSTRUCTION_OFFSET_Y, 0f)
         assertEquals(32f, ImmersiveGlassCardLayout.COVER_LEFT, 0f)
         assertEquals(300f - 270f, ImmersiveGlassCardLayout.COVER_TOP, 0f)
@@ -20,7 +22,7 @@ class ImmersiveGlassCardsTest {
         assertEquals(24f, ImmersiveGlassCardLayout.PROGRESS_TOP -
             (ImmersiveGlassCardLayout.COVER_TOP + ImmersiveGlassCardLayout.COVER_SIZE), 0f)
         assertEquals(75, ImmersiveGlassCardLayout.top())
-        assertEquals(545, ImmersiveGlassCardLayout.musicTop())
+        assertEquals(410, ImmersiveGlassCardLayout.musicTop())
         assertEquals(74, ImmersiveGlassCardLayout.MEDIA_HIT_SIZE)
     }
     @Test fun mediaHitAreasKeep115PercentSizeAndFollowMovedButtonsWithoutOverlappingProgress() {
@@ -46,23 +48,39 @@ class ImmersiveGlassCardsTest {
         assertEquals(60, ImmersiveGlassCardLayout.LEFT)
         assertEquals(35, ImmersiveGlassCardLayout.GAP)
         assertEquals(75, ImmersiveGlassCardLayout.top())
-        assertEquals(410, ImmersiveGlassCardLayout.phoneStatusTop())
-        assertEquals(545, ImmersiveGlassCardLayout.musicTop())
-        assertEquals(35, ImmersiveGlassCardLayout.phoneStatusTop() - (ImmersiveGlassCardLayout.top() + 300))
+        assertEquals(410, ImmersiveGlassCardLayout.musicTop())
         assertEquals(35, ImmersiveGlassCardLayout.musicTop() -
-            (ImmersiveGlassCardLayout.phoneStatusTop() + ImmersiveGlassCardLayout.PHONE_STATUS_HEIGHT))
+            (ImmersiveGlassCardLayout.top() + ImmersiveGlassCardLayout.HEIGHT))
         assertEquals(-15f, ImmersiveGlassCardLayout.INSTRUCTION_OFFSET_Y, 0f)
     }
     @Test fun undersizedWindowDoesNotScaleOrOverflowCards() {
         assertFalse(ImmersiveGlassCardLayout.canFit(600, 1080))
         assertFalse(ImmersiveGlassCardLayout.canFit(1920, 600))
         assertFalse(ImmersiveGlassCardLayout.canFit(1920, 661))
-        assertFalse(ImmersiveGlassCardLayout.canFit(610, 796))
-        assertTrue(ImmersiveGlassCardLayout.canFit(610, 797))
+        assertTrue(ImmersiveGlassCardLayout.canFit(610, 662))
         assertTrue(ImmersiveGlassCardLayout.canFitNavigation(610, 375))
-        assertFalse(ImmersiveGlassCardLayout.canFitPhoneStatus(610, 509))
-        assertTrue(ImmersiveGlassCardLayout.canFitPhoneStatus(610, 510))
         assertTrue(ImmersiveGlassCardLayout.canFit(1920, 1080))
+    }
+    @Test fun visibleArrowBottomTracksRoadGlyphBottomInsteadOfViewportPadding() {
+        for (fontInkBottom in listOf(-1f, 0f, 3f, 7f)) {
+            val roadBottom = ImmersiveGlassCardLayout.ROAD_BASELINE + fontInkBottom
+            for (iconInkBottom in listOf(96, 107, 108, 110)) {
+                val top = ImmersiveGlassCardLayout.arrowTop(roadBottom, iconInkBottom)
+                assertEquals(roadBottom, top + iconInkBottom, 0f)
+                assertTrue(top >= 0f)
+                assertTrue(top + ImmersiveGlassCardLayout.ARROW_SIZE < 180f)
+            }
+        }
+    }
+    @Test fun distanceFitsReservedInsetWithoutEnlargingShortText() {
+        assertEquals(55f, ImmersiveGlassCardLayout.distanceTextSize(120f, 190f), 0f)
+        assertEquals(49.5f, ImmersiveGlassCardLayout.distanceTextSize(200f, 180f), 0.0001f)
+        for (width in listOf(100f, 185f, 240f, 360f)) {
+            val available = GlassPhoneStatusLayout.distanceMaxWidth(88f)
+            val size = ImmersiveGlassCardLayout.distanceTextSize(width, available)
+            assertTrue(size > 0f && size <= 55f)
+            assertTrue(width * size / 55f <= available + 0.001f)
+        }
     }
     @Test fun compactMusicCardPreservesVisualGapsAndNavigationDimensions() {
         assertEquals(156f, ImmersiveGlassCardLayout.PROGRESS_TOP, 0f)

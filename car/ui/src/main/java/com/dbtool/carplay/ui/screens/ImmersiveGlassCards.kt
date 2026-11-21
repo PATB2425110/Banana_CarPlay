@@ -1,16 +1,17 @@
 package com.dbtool.carplay.ui.screens
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.content.Context
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -67,7 +68,8 @@ internal fun ImmersiveGlassCards(model: CarUiModel, actions: CarUiActions) {
             val top = ImmersiveGlassCardLayout.top()
             val width = with(density) { 550.toDp() }
             val height = with(density) { 300.toDp() }
-            Canvas(Modifier.offset { IntOffset(left, top) }.size(width, height)) {
+            Canvas(Modifier.offset { IntOffset(left, top) }.size(width, height)
+                .semantics { contentDescription = "导航信息，手机信号与电池电量" }) {
                 drawIntoCanvas { canvas ->
                     val c = canvas.nativeCanvas
                     glass(c, model.settings.immersiveGlassColor, model.settings.immersiveGlassTransparency)
@@ -77,37 +79,26 @@ internal fun ImmersiveGlassCards(model: CarUiModel, actions: CarUiActions) {
                     } else {
                         val kind = if (model.navigation?.guidanceState in 3..5) null
                             else clusterManeuverKindOf(model.navigation?.maneuverType)
-                        val instructionSave = c.save()
-                        c.translate(0f, ImmersiveGlassCardLayout.INSTRUCTION_OFFSET_Y)
-                        val arrowSave = c.save()
-                        c.translate(ImmersiveGlassCardLayout.ARROW_OFFSET_X, ImmersiveGlassCardLayout.ARROW_OFFSET_Y)
-                        osnManeuverIcon(kind)?.let { icons.draw(c, it, RectF(65f, 51f, 175f, 161f), Color.WHITE) }
-                        c.restoreToCount(arrowSave)
-                        text(c, navigation.distance, 188f, 105f, 55f, 325f)
-                        text(c, navigation.road, 188f, 151f, 29f, 320f)
-                        c.restoreToCount(instructionSave)
+                        val roadBottom = text(c, navigation.road,
+                            ImmersiveGlassCardLayout.INSTRUCTION_LEFT, ImmersiveGlassCardLayout.ROAD_BASELINE,
+                            ImmersiveGlassCardLayout.ROAD_TEXT_SIZE, ImmersiveGlassCardLayout.ROAD_MAX_WIDTH)
+                        osnManeuverIcon(kind)?.let {
+                            icons.drawBottomAligned(c, it, ImmersiveGlassCardLayout.ARROW_LEFT, roadBottom)
+                        }
+                        val batteryTextWidth = phoneStatusPaint(Paint.Align.LEFT, Color.WHITE)
+                            .measureText(glassPhoneBatteryText(model.phonePowerLevel))
+                        distanceText(c, navigation.distance, GlassPhoneStatusLayout.distanceMaxWidth(batteryTextWidth))
                         drawLanes(c, glassLanes(model.navigation))
                         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x30ffffff }
                         c.drawLine(32f, 225f, 518f, 225f, p)
                         text(c, navigation.remaining, 32f, 270f, 24f, 320f)
                         text(c, navigation.arrival, 385f, 270f, 25f, 140f)
                     }
+                    drawPhoneStatus(c, model)
                 }
             }
-            if (ImmersiveGlassCardLayout.canFitPhoneStatus(viewport.width, viewport.height)) {
-                Canvas(Modifier.offset { IntOffset(left, ImmersiveGlassCardLayout.phoneStatusTop()) }
-                    .size(width, with(density) { ImmersiveGlassCardLayout.PHONE_STATUS_HEIGHT.toDp() })
-                    .semantics { contentDescription = "信号、电池电量、取电电流" }) {
-                    drawIntoCanvas { canvas ->
-                        val c = canvas.nativeCanvas
-                        glass(c, model.settings.immersiveGlassColor, model.settings.immersiveGlassTransparency,
-                            ImmersiveGlassCardLayout.PHONE_STATUS_HEIGHT.toFloat())
-                        drawPhoneStatus(c, model)
-                    }
-                }
-            }
-            // Do not blank the upper cards merely because the relocated music card
-            // cannot fit a smaller tablet viewport. Never scale or overlap the cards.
+            // The phone inset belongs to navigation even when the music card cannot fit.
+            // Never scale or overlap the two card containers.
             if (!ImmersiveGlassCardLayout.canFit(viewport.width, viewport.height)) return@Box
             val musicTop = ImmersiveGlassCardLayout.musicTop()
             Box(Modifier.offset { IntOffset(left, musicTop) }
@@ -175,24 +166,30 @@ internal fun ImmersiveGlassCards(model: CarUiModel, actions: CarUiActions) {
 /** Read-only phone telemetry: no local battery/radio fallback and no click surface. */
 private fun drawPhoneStatus(c: Canvas, model: CarUiModel) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val signalSave = c.save()
+    c.translate(GlassPhoneStatusLayout.SIGNAL_LEFT, GlassPhoneStatusLayout.SIGNAL_TOP)
+    c.scale(GlassPhoneStatusLayout.SIGNAL_SCALE, GlassPhoneStatusLayout.SIGNAL_SCALE)
     glassPhoneSignalBars(model.phoneSignalStrength).forEachIndexed { index, active ->
         paint.color = if (active) Color.WHITE else 0xff666666.toInt()
-        val x = GlassPhoneStatusLayout.SIGNAL_LEFT + index * GlassPhoneStatusLayout.SIGNAL_STEP
+        val x = index * GlassPhoneStatusLayout.SIGNAL_STEP
         val height = 10f + index * 8f
         val bottom = GlassPhoneStatusLayout.SIGNAL_BOTTOM
         c.drawRoundRect(RectF(x, bottom - height,
             x + GlassPhoneStatusLayout.SIGNAL_BAR_WIDTH, bottom), 3f, 3f, paint)
     }
+    c.restoreToCount(signalSave)
     val batteryText = glassPhoneBatteryText(model.phonePowerLevel)
     val batteryColor = if (glassPhoneBatteryFill(model.phonePowerLevel) == null) 0xff888888.toInt()
         else glassPhonePowerColor(model.phonePowerLevel, model.phoneChargingState)
     val batteryTextWidth = phoneStatusPaint(Paint.Align.LEFT, batteryColor).measureText(batteryText)
-    drawPhoneBattery(c, model.phonePowerLevel, model.phoneChargingState,
-        GlassPhoneStatusLayout.batteryLeft(batteryTextWidth))
+    val batterySave = c.save()
+    c.translate(GlassPhoneStatusLayout.batteryLeft(batteryTextWidth), GlassPhoneStatusLayout.BATTERY_CENTER_Y)
+    c.scale(GlassPhoneStatusLayout.BATTERY_SCALE, GlassPhoneStatusLayout.BATTERY_SCALE)
+    drawPhoneBattery(c, model.phonePowerLevel, model.phoneChargingState, 0f)
     phoneStatusText(c, batteryText,
-        GlassPhoneStatusLayout.batteryValueLeft(batteryTextWidth), Paint.Align.LEFT, batteryColor)
-    phoneStatusText(c, glassPhoneCurrentText(model.phoneMaxCurrentDrawnMa),
-        GlassPhoneStatusLayout.CURRENT_CENTER_X, Paint.Align.CENTER, Color.WHITE)
+        GlassPhoneStatusLayout.BATTERY_WIDTH + GlassPhoneStatusLayout.BATTERY_TERMINAL_EXTENT +
+            GlassPhoneStatusLayout.BATTERY_VALUE_GAP, Paint.Align.LEFT, batteryColor)
+    c.restoreToCount(batterySave)
 }
 
 private fun drawPhoneBattery(c: Canvas, level: Int?, chargingState: Int?, left: Float) {
@@ -316,7 +313,7 @@ private fun glass(c: Canvas, rgb: Int, transparency: Int, height: Float = 300f) 
     c.drawRoundRect(RectF(5f, 5f, 545f, height - 5f), 33f, 33f, p)
 }
 
-private fun text(c: Canvas, value: String, x: Float, y: Float, size: Float, max: Float, alpha: Int = 255) {
+private fun text(c: Canvas, value: String, x: Float, y: Float, size: Float, max: Float, alpha: Int = 255): Float {
     val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE; this.alpha = alpha; textSize = size
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
@@ -326,7 +323,21 @@ private fun text(c: Canvas, value: String, x: Float, y: Float, size: Float, max:
         val end = p.breakText(result, true, (max - p.measureText("…")).coerceAtLeast(0f), null)
         result = result.take(end) + "…"
     }
+    val ink = Rect()
+    p.getTextBounds(result, 0, result.length, ink)
     c.drawText(result, x, y, p)
+    return y + ink.bottom
+}
+
+/** Reserve the upper-right inset without truncating the supplied distance or changing its value. */
+private fun distanceText(c: Canvas, value: String, maxWidth: Float) {
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textSize = ImmersiveGlassCardLayout.DISTANCE_TEXT_SIZE
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+    }
+    paint.textSize = ImmersiveGlassCardLayout.distanceTextSize(paint.measureText(value), maxWidth)
+    c.drawText(value, ImmersiveGlassCardLayout.INSTRUCTION_LEFT, ImmersiveGlassCardLayout.DISTANCE_BASELINE, paint)
 }
 
 private fun centered(c: Canvas, value: String, y: Float, size: Float, max: Float, alpha: Int = 255) {
@@ -344,11 +355,27 @@ private fun triangle(c: Canvas, x: Float, y: Float, right: Boolean, p: Paint) {
 }
 
 private class OsnIconPainter(private val context: Context) {
-    private val drawables = HashMap<Int, Drawable>()
-    fun draw(c: Canvas, resource: Int, rect: RectF, tint: Int) {
-        val drawable = drawables.getOrPut(resource) { requireNotNull(context.getDrawable(resource)).mutate() }
-        drawable.setTint(tint)
-        drawable.setBounds(rect.left.toInt(), rect.top.toInt(), rect.right.toInt(), rect.bottom.toInt())
-        drawable.draw(c)
+    private data class Icon(val bitmap: Bitmap, val inkBottom: Int)
+    private val icons = HashMap<Int, Icon>()
+
+    fun drawBottomAligned(c: Canvas, resource: Int, left: Float, roadInkBottom: Float) {
+        val icon = icons.getOrPut(resource) {
+            val size = ImmersiveGlassCardLayout.ARROW_SIZE
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val drawable = requireNotNull(context.getDrawable(resource)).mutate()
+            drawable.setTint(Color.WHITE)
+            drawable.setBounds(0, 0, size, size)
+            drawable.draw(Canvas(bitmap))
+            // The vector viewport contains transparent padding. Measure once per icon, not per
+            // frame, so the visible arrow/arrival glyph meets the road's actual glyph bottom.
+            val pixels = IntArray(size * size)
+            bitmap.getPixels(pixels, 0, size, 0, 0, size, size)
+            val lastRow = (size - 1 downTo 0).firstOrNull { y ->
+                (0 until size).any { x -> (pixels[y * size + x] ushr 24) != 0 }
+            }
+            Icon(bitmap, lastRow?.plus(1) ?: size)
+        }
+        c.drawBitmap(icon.bitmap, left,
+            ImmersiveGlassCardLayout.arrowTop(roadInkBottom, icon.inkBottom), null)
     }
 }

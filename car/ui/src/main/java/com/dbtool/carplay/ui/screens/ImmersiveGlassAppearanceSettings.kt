@@ -36,14 +36,14 @@ internal fun ImmersiveGlassAppearanceSettings(
     val rgb = settings.immersiveGlassColor.takeIf { it in 0..0xffffff } ?: 0x514b4b
     CarCard(modifier = Modifier.fillMaxWidth()) {
         CarSettingAction(
-            title = "三卡片颜色与透明度",
+            title = "卡片颜色与透明度",
             value = "${label(settings.immersiveGlassColor)} · 底色透明度${settings.immersiveGlassTransparency.coerceIn(0, 100)}%",
             onClick = { expanded = !expanded },
         )
         if (expanded) {
             CarRowDivider()
             CarSettingChoice(
-                title = "三张卡片共用底色",
+                title = "导航与音乐卡片共用底色",
                 options = if (settings.immersiveGlassColor in presets) presets else presets + settings.immersiveGlassColor,
                 selected = settings.immersiveGlassColor,
                 onSelect = { update(settings.copy(immersiveGlassColor = it)) },
@@ -71,7 +71,7 @@ internal fun ImmersiveGlassAppearanceSettings(
                 valueLabel = "${settings.immersiveGlassTransparency.coerceIn(0, 100)}%",
                 onValueChange = { update(settings.copy(immersiveGlassTransparency = it.roundToInt().coerceIn(0, 100))) },
             )
-            CarButton(text = "恢复三卡片默认外观",
+            CarButton(text = "恢复卡片默认外观",
                 onClick = { update(settings.copy(immersiveGlassColor = -1, immersiveGlassTransparency = 15)) })
         }
     }

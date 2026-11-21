@@ -2713,9 +2713,9 @@
     },
     {
       "path": "car/core-bridge/src/test/java/com/dbtool/carplay/bridge/ProductionHudProbeRemovalTest.kt",
-      "bytes": 1266,
-      "sourceSHA256": "37E06C9C322AEE22EA4B304E1B9F88CADE1F615D867C57BEE8B25C3F849D43AE",
-      "sha256": "37E06C9C322AEE22EA4B304E1B9F88CADE1F615D867C57BEE8B25C3F849D43AE",
+      "bytes": 1385,
+      "sourceSHA256": "B8910DA324EF4280EF54D4A08B3F42BC9B2118BDEA1C49397E7B779A077D3047",
+      "sha256": "B8910DA324EF4280EF54D4A08B3F42BC9B2118BDEA1C49397E7B779A077D3047",
       "unchangedBytes": true
     },
     {
@@ -4414,23 +4414,23 @@
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassAppearanceSettings.kt",
-      "bytes": 3596,
-      "sourceSHA256": "3DEFD20BFCB032839EA2D24B410E7B7EF24F5D6D854718F83A486F6A95B40B60",
-      "sha256": "3DEFD20BFCB032839EA2D24B410E7B7EF24F5D6D854718F83A486F6A95B40B60",
+      "bytes": 3599,
+      "sourceSHA256": "B2C8A2D25B16C7AAFE5A5872CF6A3ABCA59ADE05CCD1CEDB5CC68F55BC2B4BE6",
+      "sha256": "B2C8A2D25B16C7AAFE5A5872CF6A3ABCA59ADE05CCD1CEDB5CC68F55BC2B4BE6",
       "unchangedBytes": true
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardLayout.kt",
-      "bytes": 6879,
-      "sourceSHA256": "8C5D934CE49DDF99E587F3816800A4311A1E9585815C4E24CAD67C8CE639DAB2",
-      "sha256": "8C5D934CE49DDF99E587F3816800A4311A1E9585815C4E24CAD67C8CE639DAB2",
+      "bytes": 7635,
+      "sourceSHA256": "1E0C5B7C352EA1E293490C12A7DE9FF58F5CE286375FF954500A38846FAA43D9",
+      "sha256": "1E0C5B7C352EA1E293490C12A7DE9FF58F5CE286375FF954500A38846FAA43D9",
       "unchangedBytes": true
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt",
-      "bytes": 19033,
-      "sourceSHA256": "2FE7D90D1667F6098AC386FBD2478DCF41E43DE17E3CF6B8E70C6136F1F9D8B8",
-      "sha256": "2FE7D90D1667F6098AC386FBD2478DCF41E43DE17E3CF6B8E70C6136F1F9D8B8",
+      "bytes": 20380,
+      "sourceSHA256": "8C76FC6BCD9FF9EC28E5DC1EBB141EE1D837CBC51C3A70E61C097B4924B827B5",
+      "sha256": "8C76FC6BCD9FF9EC28E5DC1EBB141EE1D837CBC51C3A70E61C097B4924B827B5",
       "unchangedBytes": true
     },
     {
@@ -4470,9 +4470,9 @@
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt",
-      "bytes": 193419,
-      "sourceSHA256": "ADDF33C93B52D1C03FEC8C2DC3D99F5AF2321BEDAF9AD741D8434A8187551AB5",
-      "sha256": "ADDF33C93B52D1C03FEC8C2DC3D99F5AF2321BEDAF9AD741D8434A8187551AB5",
+      "bytes": 193434,
+      "sourceSHA256": "7AFBA053ABD478D57E69117E1F2406EE788755D17C147DA090C35126992DFF78",
+      "sha256": "7AFBA053ABD478D57E69117E1F2406EE788755D17C147DA090C35126992DFF78",
       "unchangedBytes": true
     },
     {
@@ -4743,9 +4743,9 @@
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardsTest.kt",
-      "bytes": 7596,
-      "sourceSHA256": "F0F2925E8E2EC85D329A8DC602276A2A11C3CD907DA2E57FF75A8CE7C5A6E08B",
-      "sha256": "F0F2925E8E2EC85D329A8DC602276A2A11C3CD907DA2E57FF75A8CE7C5A6E08B",
+      "bytes": 8481,
+      "sourceSHA256": "FABF4940262AFE4DCFFFB6463075E01742FF3AB6CC4F4489A8999772E95C2799",
+      "sha256": "FABF4940262AFE4DCFFFB6463075E01742FF3AB6CC4F4489A8999772E95C2799",
       "unchangedBytes": true
     },
     {
@@ -4771,9 +4771,9 @@
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/PhoneStatusCardTest.kt",
-      "bytes": 5676,
-      "sourceSHA256": "E1E7CAD5BFEAE79013F52BF108DA485FFD97D1341AC6F44B0408FCB53C707EB5",
-      "sha256": "E1E7CAD5BFEAE79013F52BF108DA485FFD97D1341AC6F44B0408FCB53C707EB5",
+      "bytes": 8453,
+      "sourceSHA256": "38C3ACFF17A0312A4BFF7DD4A9FA8E7B3B847B1B5E30DE5DA5B4584E89C2B160",
+      "sha256": "38C3ACFF17A0312A4BFF7DD4A9FA8E7B3B847B1B5E30DE5DA5B4584E89C2B160",
       "unchangedBytes": true
     },
     {
@@ -7061,5 +7061,27 @@
     "jump-host service scripts",
     "local SDK/signing paths",
     ".github automation"
+  ],
+  "updates": [
+    {
+      "kind": "UI-only navigation phone inset and music-card relocation",
+      "sourceFiles": [
+        "car/core-bridge/src/test/java/com/dbtool/carplay/bridge/ProductionHudProbeRemovalTest.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassAppearanceSettings.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardLayout.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardsTest.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/PhoneStatusCardTest.kt"
+      ],
+      "tag": "v1.4.2-375-202611212006",
+      "tests": {
+        "tests": 2472,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "noPrivateDiagnosticsOrSigningMaterial": true
+    }
   ]
 }

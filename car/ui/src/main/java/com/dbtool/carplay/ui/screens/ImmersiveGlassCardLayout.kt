@@ -14,7 +14,14 @@ internal object ImmersiveGlassCardLayout {
     const val TOP = 75
     const val INSTRUCTION_OFFSET_Y = -15f
     const val ARROW_OFFSET_X = -15f
-    const val ARROW_OFFSET_Y = -20f
+    const val ARROW_SIZE = 110
+    const val ARROW_LEFT = 65f + ARROW_OFFSET_X
+    const val INSTRUCTION_LEFT = 188f
+    const val DISTANCE_BASELINE = 105f + INSTRUCTION_OFFSET_Y
+    const val DISTANCE_TEXT_SIZE = 55f
+    const val ROAD_BASELINE = 151f + INSTRUCTION_OFFSET_Y
+    const val ROAD_TEXT_SIZE = 29f
+    const val ROAD_MAX_WIDTH = 320f
     const val COVER_LEFT = 32f
     const val COVER_TOP = 30f
     const val COVER_SIZE = 102f
@@ -24,48 +31,61 @@ internal object ImmersiveGlassCardLayout {
     const val MEDIA_ICON_TOP = PROGRESS_BOTTOM + 30f
     const val MEDIA_ICON_BOTTOM = MEDIA_ICON_TOP + 30f
     const val MUSIC_HEIGHT = 252
-    const val PHONE_STATUS_HEIGHT = 100
     const val MUSIC_TEXT_LEFT = 158f
-    const val TOTAL_HEIGHT = HEIGHT + PHONE_STATUS_HEIGHT + MUSIC_HEIGHT + GAP * 2
+    const val TOTAL_HEIGHT = HEIGHT + GAP + MUSIC_HEIGHT
     // 64px × 1.15, rounded to whole physical pixels; preserve the original hit-area centre.
     const val MEDIA_HIT_SIZE = 74
     const val MEDIA_HIT_CENTER_Y = 209
     fun mediaHitLeft(centerX: Int): Int = centerX - MEDIA_HIT_SIZE / 2
     fun mediaHitTop(): Int = MEDIA_HIT_CENTER_Y - MEDIA_HIT_SIZE / 2
     fun top(): Int = TOP
-    fun phoneStatusTop(): Int = TOP + HEIGHT + GAP
-    fun musicTop(): Int = phoneStatusTop() + PHONE_STATUS_HEIGHT + GAP
+    fun musicTop(): Int = TOP + HEIGHT + GAP
     fun canFitNavigation(width: Int, height: Int) = width >= LEFT + WIDTH && height >= TOP + HEIGHT
-    fun canFitPhoneStatus(width: Int, height: Int) =
-        width >= LEFT + WIDTH && height >= phoneStatusTop() + PHONE_STATUS_HEIGHT
     fun canFit(width: Int, height: Int) = width >= LEFT + WIDTH && height >= TOP + TOTAL_HEIGHT
+
+    /** Both values are visible ink bounds, not the vector viewport or font baseline. */
+    fun arrowTop(roadInkBottom: Float, iconInkBottom: Int): Float = roadInkBottom - iconInkBottom
+
+    fun distanceTextSize(measuredWidth: Float, availableWidth: Float): Float =
+        if (measuredWidth > availableWidth && measuredWidth > 0f) {
+            DISTANCE_TEXT_SIZE * (availableWidth / measuredWidth).coerceIn(0f, 1f)
+        } else DISTANCE_TEXT_SIZE
 }
 
-/** One centered row in the compact phone card; all coordinates are physical pixels. */
+/** Two right-aligned rows INSIDE the navigation card, not a separate phone-status card. */
 internal object GlassPhoneStatusLayout {
-    const val CENTER_Y = ImmersiveGlassCardLayout.PHONE_STATUS_HEIGHT / 2f
-    const val CELL_WIDTH = ImmersiveGlassCardLayout.WIDTH / 3f
-    const val SIGNAL_CENTER_X = CELL_WIDTH / 2f
-    const val BATTERY_CENTER_X = CELL_WIDTH * 1.5f
-    const val CURRENT_CENTER_X = CELL_WIDTH * 2.5f
+    const val RIGHT = 518f
+    const val SIGNAL_TOP = 24f
+    const val SIGNAL_SCALE = 0.7f
+    const val BATTERY_SCALE = 0.8f
+    const val BATTERY_CENTER_Y = 78f
+    const val CENTER_Y = 0f
     const val SIGNAL_STEP = 22f
     const val SIGNAL_BAR_WIDTH = 14f
     const val SIGNAL_WIDTH = SIGNAL_STEP * 4f + SIGNAL_BAR_WIDTH
-    const val SIGNAL_LEFT = SIGNAL_CENTER_X - SIGNAL_WIDTH / 2f
-    const val SIGNAL_BOTTOM = CENTER_Y + 21f
+    const val SIGNAL_HEIGHT = 42f
+    const val SIGNAL_LEFT = RIGHT - SIGNAL_WIDTH * SIGNAL_SCALE
+    const val SIGNAL_BOTTOM = SIGNAL_HEIGHT
     const val BATTERY_WIDTH = 56f
     const val BATTERY_HEIGHT = 30f
     const val BATTERY_TERMINAL_EXTENT = 6f
     const val BATTERY_VALUE_GAP = 14f
     const val VALUE_TEXT_SIZE = 32f
 
-    // Center the complete battery + percentage group, not just the battery body.
+    const val DISTANCE_GAP = 16f
+
+    fun batteryGroupWidth(valueTextWidth: Float): Float =
+        (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT + BATTERY_VALUE_GAP + valueTextWidth) * BATTERY_SCALE
+
+    // Scale the icon, terminal, gap AND percentage as one group and keep its right edge stable.
     fun batteryLeft(valueTextWidth: Float): Float =
-        BATTERY_CENTER_X - (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT +
-            BATTERY_VALUE_GAP + valueTextWidth) / 2f
+        RIGHT - batteryGroupWidth(valueTextWidth)
 
     fun batteryValueLeft(valueTextWidth: Float): Float =
-        batteryLeft(valueTextWidth) + BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT + BATTERY_VALUE_GAP
+        batteryLeft(valueTextWidth) + (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT + BATTERY_VALUE_GAP) * BATTERY_SCALE
+
+    fun distanceMaxWidth(valueTextWidth: Float): Float =
+        minOf(SIGNAL_LEFT, batteryLeft(valueTextWidth)) - DISTANCE_GAP - ImmersiveGlassCardLayout.INSTRUCTION_LEFT
 }
 
 /** Convert the phone's mA value exactly to A, without locale commas or rounding. */

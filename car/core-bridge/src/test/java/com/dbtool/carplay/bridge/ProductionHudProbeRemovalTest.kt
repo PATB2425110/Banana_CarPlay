@@ -12,12 +12,14 @@ class ProductionHudProbeRemovalTest {
         assertFalse(activity.contains("HudOverlayProbe"))
         assertFalse(File(root, "car/platform-geely/src/main/java/com/dbtool/carplay/geely/hud/HudOverlayProbe.kt").exists())
     }
-    @Test fun allThreeCardBackgroundsUseOneSettingAndNoLiteralOldProgressGeometry() {
+    @Test fun bothCardBackgroundsUseOneSettingAndNoLiteralOldProgressGeometry() {
         val root = generateSequence(File(requireNotNull(System.getProperty("user.dir")))) { it.parentFile }
             .first { File(it, "shared/src/main").isDirectory }
         val cards = File(root, "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt").readText()
-        assertEquals(3, Regex("glass\\(c, model.settings.immersiveGlassColor, model.settings.immersiveGlassTransparency")
+        assertEquals(2, Regex("glass\\(c, model.settings.immersiveGlassColor, model.settings.immersiveGlassTransparency")
             .findAll(cards).count())
+        assertFalse(cards.contains("PHONE_STATUS_HEIGHT"))
+        assertTrue(cards.contains("drawPhoneStatus(c, model)"))
         assertFalse(cards.contains("RectF(32f, 208f"))
     }
 }
