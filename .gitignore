@@ -1,0 +1,63 @@
+# Android Studio and local IDE state
+.idea/
+*.iml
+.vscode/
+
+# Gradle and local tooling
+.gradle/
+.kotlin/
+build/
+local.properties
+
+# Native build output
+.cxx/
+.externalNativeBuild/
+captures/
+
+# Local agent working notes
+agent_docs/
+research/
+
+tools/
+mobile/release/
+mobile/debug/
+
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+/.idea
+
+# 本地备份与构建产物（不入库）
+.backup_*/
+.bak_*/
+/apk/
+
+# 本地任务报告（Codex/Claude 审查产出，不入库）
+codex_review/
+claude_runs/
+claude_tasks/
+
+# Private upload snapshot safety
+**/offline-mfi/
+**/keystore/
+**/signing/
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pk8
+*.pem
+*.key
+*.dpapi
+keystore.properties
+local.properties
+.env
+.env.*
+**/build/
+**/.gradle/
+**/.kotlin/
+*.apk
+*.idsig
+*.log

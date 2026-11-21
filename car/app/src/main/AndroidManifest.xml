@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Declaration only. This system/signature permission must already be legitimately
+         granted by the OEM; the app neither requests a runtime grant nor elevates itself.
+         CarPropertyService rechecks read access. No vehicle setter is used by this feature. -->
+    <uses-permission android:name="android.car.permission.CAR_VENDOR_EXTENSION" />
+
+    <!--
+        在线更新：允许本应用拉起系统安装器安装自己下载的 APK。
+
+        没有它，`ACTION_VIEW` 的安装意图会被系统直接拒掉，现场表现是
+        "点了安装没反应"。用户侧还需要额外打开「安装未知应用」开关
+        （`canRequestPackageInstalls()`），那条由代码引导，不在这里申请。
+    -->
+
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="false" />
+
+    <application
+        android:name=".CarPlayApplication"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.DBPlay">
+
+        <!-- Optional: ordinary Android/tablet installs do not require the vehicle framework. -->
+        <uses-library android:name="android.car" android:required="false" />
+
+        <!--
+            产品入口。二开 UI 是唯一宿主。
+
+            横屏锁定：车机中控是固定横屏，不跟随传感器翻转——
+            翻转会让 CarPlay 画面重新握手，代价远大于收益。
+
+            configChanges 覆盖屏幕尺寸/密度/UI 模式：
+            这些变化由 Compose 自行重排，不应重建 Activity
+            （重建会打断 CarPlay 会话）。
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|navigation|touchscreen|fontScale"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.DBPlay"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/usb_device_filter" />
+        </activity>
+
+        <!--
+            封禁页：只由 BlockGate / 运行期拦截显式拉起。
+            不导出、无 launcher 入口；CLEAR_TASK 已在拉起时带上。
+        -->
+        <activity
+            android:name=".BlockedActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:noHistory="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.DBPlay" />
+
+        <!-- 开机自启：整机点火后自动进入待连状态。 -->
+        <!-- 同时接 MY_PACKAGE_REPLACED：覆盖安装后调度一次性 dex 预热（DexWarmup）。 -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+            车机媒体卡片 / 硬媒体键的**入向**命令（2026-10-19 补）。
+
+            车机以 ecarx.intent.broadcast.action.MEDIA_CONTROL_RECEIVER 发隐式广播，
+            extra RECEIVER_MEDIA_CONTROL 带命令字符串（PLAY/PAUSE/SKIP_TO_NEXT/
+            SKIP_TO_PREVIOUS）。契约见 CarMediaControlCommand，实现在
+            io.dushu.car.receiver.MediaControlReceiver。
+
+            ⚠️ 三处都不能"顺手改"：
+            1. android:name 必须是 io.dushu.car.receiver.MediaControlReceiver
+               —— 刻意占用帆书的包名与类名，车机若按组件名显式发就只有这个名字收得到；
+            2. action 字符串是跨进程契约，与 CarMediaControlCommand.ACTION 必须一致
+               （清单里没法引用 Kotlin 常量，只能硬写，改一处必须改两处）；
+            3. exported 必须 true：发广播的是车机系统应用，不是本应用自己。
+        -->
+        <receiver
+            android:name="io.dushu.car.receiver.MediaControlReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="ecarx.intent.broadcast.action.MEDIA_CONTROL_RECEIVER" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+            装完预热：只把进程撑住 25 秒，让加固壳的 dex2oat 跑完。
+            exported=false + BIND_JOB_SERVICE：只有系统 JobScheduler 能起它。
+        -->
+        <service
+            android:name=".DexWarmupJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!--
+            :shared 的 Android Auto 占位服务只显示"硬件传输未配置"，
+            与本产品无关，从合并清单中移除，避免出现多余的 Car App 入口。
+            这是本模块清单里的操作，**没有修改上游文件**。
+        -->
+        <service
+            android:name="com.shilapi.xcertplay.shared.MyCarAppService"
+            tools:node="remove" />
+
+        <!--
+            在线更新把下载好的 APK 交给系统安装器时，必须用 `content://` URI
+            （Android 7 起 `file://` 跨进程会抛 `FileUriExposedException`）。
+            authority 必须与 `CarApkInstaller` 里拼的
+            "${applicationId}.fileprovider" 一致。
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

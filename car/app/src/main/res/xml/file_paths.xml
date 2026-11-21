@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    在线更新的安装包路径白名单。
+
+    只开 `update/` 这一个子目录：FileProvider 的白名单是"能暴露哪些文件"的
+    边界，把整个 filesDir 开出去等于让任何拿到 URI 的组件都能读本应用的私有数据。
+    路径必须与 `CarUpdateManager.apkFileFor()` 里拼的
+    `filesDir/update/DBPlay-<versionCode>.apk` 对应。
+-->
+<paths>
+    <files-path
+        name="update"
+        path="update/" />
+</paths>

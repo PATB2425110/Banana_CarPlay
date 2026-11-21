@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        ============================================================
+        车机宿主主题：为什么拆成 Base + 空壳两层
+        ============================================================
+
+        Android 12（API 31）起，**系统会强制为每个 Activity 显示启动画面**
+        （splash screen，窗口类型 `APPLICATION_STARTING`）：图标居中 + 纯色底。
+        它由 `windowSplashScreenAnimatedIcon` / `windowSplashScreenBackground`
+        两个主题属性控制，**没有开关可以关掉**（`targetSdk >= 31` 时必然出现）。
+
+        本工程 `targetSdk = 37`，于是 Android 12+ 的机器上冷启动会先看到
+        一个「紫色圆角方块 logo 居中」的页面，正是要取消的那一页。
+
+        修法是在 `values-v31/themes.xml` 里覆盖这两个属性（图标换成全透明、
+        底色换成窗口底色 ⇒ splash 只剩一层纯色，与 Compose 首帧无缝相接）。
+        但 `values-v31/` 里的同名 style 是**整体替换**而不是逐项合并，
+        照抄一遍所有条目迟早会漏，所以把公共条目收进 `Theme.DBPlayBase`，
+        `Theme.DBPlay` 只做一层壳：
+
+            values/      Theme.DBPlayBase   公共条目（唯一的一份）
+            values/      Theme.DBPlay       = Theme.DBPlayBase（无附加）
+            values-v31/  Theme.DBPlay       = Theme.DBPlayBase + splash 两项
+
+        ⇒ **以后往公共条目里加东西，只改 `Theme.DBPlayBase` 一处即可**，
+        v31 分支自动跟上。
+
+        ⚠️ Base 刻意**不带点号**（不叫 `Theme.DBPlay.Base`）：style 名里的点号
+        表示隐式继承父级，虽然显式写 `parent` 会覆盖它，但没必要留这个坑。
+
+        ⚠️ XML 注释里不能出现连续两个减号（含分隔线），本文件一律用等号。
+
+        ============================================================
+        公共条目本身
+        ============================================================
+
+        parent 用 `android:Theme.Material.NoActionBar`（深色）而不是
+        `Theme.Material.Light.NoActionBar`：这只影响系统控件（对话框、
+        文本选择手柄）的默认样式，页面本身的配色完全由 Compose 决定。
+        车机夜间/隧道场景占多数，系统控件默认深色更不容易刺眼。
+
+        窗口底色**不再写死黑色**：冷启动到 Compose 第一帧之间，
+        屏幕上显示的就是 `windowBackground`。写死黑色会让浅色主题下
+        先闪一次黑屏，再跳成浅灰，启动观感上最明显的一处廉价感。
+        现在它跟随 day/night 资源，与 `CarColors.background` 逐项对应。
+
+        ⚠️ `colorBackground` 也必须一起设：Android 12+ 的 splash 底色默认取
+        `colorBackground`，只设 `windowBackground` 的话 v31 之前是对的、
+        v31 之后底色会跳成系统默认值（浅色机器上是白，深色机器上是黑）。
+    -->
+    <style name="Theme.DBPlayBase" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/car_window_background</item>
+        <item name="android:colorBackground">@color/car_window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+    <!--
+        API 28..30：没有 splash screen 这回事，主题就是 Base 本身。
+        （本产品的 minSdk 是 28，车机实测是 Android 9 / API 28。）
+    -->
+    <style name="Theme.DBPlay" parent="Theme.DBPlayBase" />
+</resources>

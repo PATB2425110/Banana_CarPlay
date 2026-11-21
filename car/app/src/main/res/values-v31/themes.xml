@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        ============================================================
+        API 31+（Android 12）专属：取消系统强制的启动画面
+        ============================================================
+
+        ## 现象
+
+        在 Android 12+ 的机器上冷启动本应用，会先出现一页
+        「紫色圆角方块 logo 居中、浅灰底」的画面，约 0.3~1.7 秒后才进应用。
+        实测证据（ishtar / SDK 32）：
+
+            Window{cbbdfbf u0 Splash Screen com.dbtool.carplay}
+            ty=APPLICATION_STARTING fmt=TRANSLUCENT
+
+        ## 成因
+
+        Android 12 起，`targetSdk >= 31` 的应用**必然**被系统套一层启动画面，
+        没有开关能关。两个属性决定它的样子，且都只影响 API 31+：
+
+        1. `windowSplashScreenAnimatedIcon` 默认取**应用图标**
+           （实测取到 `@mipmap/ic_launcher`，即那个紫色方块）；
+        2. `windowSplashScreenBackground` 默认取 `?android:colorBackground`
+           （实测取到 `#F7F8FA`）。
+
+        截图里那个浅灰底 + 紫色方块 logo，就是这两项的组合。
+
+        ## 修法
+
+        在 v31 这一层只覆盖这两项：
+
+        1. **图标换成全透明**（`@drawable/ic_splash_blank`）⇒ logo 不再出现；
+        2. **底色换成与窗口底色同一个 `@color/car_window_background`**
+           ⇒ splash 变成一层纯色，且与 Compose 第一帧**同色**，
+           交接处看不出来（`-night` 自动跟随深色，不用单独写 `values-night-v31`）。
+
+        合起来的效果就是「点开直接进应用」。
+
+        ## 为什么不能真的「移除」这一页
+
+        splash 窗口是系统在**应用进程起来之前**创建的（`APPLICATION_STARTING`），
+        生命周期由 WindowManager 控制，应用侧既看不到也拦不住。
+        能做到的极限就是让它**看起来不存在**，即底色与首帧一致。
+        这与本项目一贯的取舍一致（见 `values/themes.xml` 里关于
+        「冷启动只闪一次色」的注释）。
+
+        ## ⚠️ 这里的 style 是整体替换，不是逐项合并
+
+        本文件里的 `Theme.DBPlay` 会**整个替换** `values/themes.xml` 里的同名 style。
+        公共条目一律放在 `Theme.DBPlayBase`（只定义一次，本文件继承它），
+        **不要**把 `values/` 里那些条目照抄过来。
+
+        ⚠️ XML 注释里不能出现连续两个减号，本文件一律用等号做分隔。
+    -->
+    <style name="Theme.DBPlay" parent="Theme.DBPlayBase">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_blank</item>
+        <item name="android:windowSplashScreenBackground">@color/car_window_background</item>
+    </style>
+</resources>

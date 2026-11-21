@@ -1,0 +1,80 @@
+{
+  "stage": "Signed Release preflight, eight-module tests after R8 name-preservation guard",
+  "scope": "Eight-module local JVM tests, not vehicle/iPhone acceptance.",
+  "modules": [
+    {
+      "module": "shared",
+      "suites": 68,
+      "tests": 469,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/api",
+      "suites": 8,
+      "tests": 153,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/core-bridge",
+      "suites": 159,
+      "tests": 1311,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-android",
+      "suites": 1,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-ecarx",
+      "suites": 7,
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-geely",
+      "suites": 39,
+      "tests": 291,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/ui",
+      "suites": 22,
+      "tests": 152,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/app",
+      "suites": 5,
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "totals": {
+    "tests": 2468,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "junitFiles": 309,
+  "log": "C:\\Users\\17900\\AppData\\Local\\Temp\\opencode\\vehicle-read-safety-release-tests-20261121.log",
+  "gradleExitCode": 0,
+  "gradleResult": "BUILD SUCCESSFUL in 38s; 182 actionable tasks: 182 executed"
+}

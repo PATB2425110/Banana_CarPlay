@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        CH341 USB\VID_1A86&PID_5512（MFi 桥接芯片）。
+        与上游 `common/src/main/res/xml/usb_device_filter.xml` 取值一致：
+        声明它之后，CH341 插入时系统会把 USB 权限直接授予本应用，
+        不需要用户手动确认弹窗。
+    -->
+    <usb-device vendor-id="6790" product-id="21778" />
+
+    <!--
+        Apple（VID 0x05AC = 1452）。**有线 CarPlay 的前提条件。**
+
+        ## 为什么必须声明
+
+        有线 CarPlay 的链路是：iPhone 插上车机 USB → 车机作为 USB Host
+        打开 Apple 设备 → 走 iAP2 建会话（见 `IphoneUsbHost`）。
+        而 `UsbManager.openDevice()` 需要**该设备对本应用的 USB 权限**。
+
+        不声明这条匹配时，权限只能靠 `UsbManager.requestPermission()` 弹系统对话框
+        由用户点"允许"。车机上这条路的三个问题：
+        ① 车机的 USB 口常被饰板挡住，对话框可能被车机自己的 UI 压住，用户根本看不到；
+        ② 用户以为"插上就该能用"，不会去找一个没出现的弹窗；
+        ③ 熄火重启后授权不保留，每次都要重点一遍。
+
+        声明之后，匹配设备插入时系统会**自动把权限授予本应用**并拉起
+        `MainActivity`（这就是本 Activity 上那个 `USB_DEVICE_ATTACHED` intent-filter
+        的用途），有线 CarPlay 不再依赖任何用户确认。
+
+        ## 只写 vendor-id、不写 product-id
+
+        iPhone / iPad 的 product-id 随型号和固件变化（1290 / 1291 / 1292 …），
+        逐个枚举必然漏掉新机型。`vendor-id` 单独匹配即可覆盖全部 Apple 设备；
+        代价是插上一台只充电的 iPad 也会拉起本应用——车机上这正是期望行为。
+    -->
+    <usb-device vendor-id="1452" />
+</resources>

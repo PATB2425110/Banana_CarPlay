@@ -1,0 +1,80 @@
+{
+  "kind": "Isolated sanitized upload-source validation, after VIN-mask fixture adjustment",
+  "totals": {
+    "tests": 2468,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "modules": [
+    {
+      "module": "shared",
+      "suites": 68,
+      "tests": 469,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/api",
+      "suites": 8,
+      "tests": 153,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/core-bridge",
+      "suites": 159,
+      "tests": 1311,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-android",
+      "suites": 1,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-ecarx",
+      "suites": 7,
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-geely",
+      "suites": 39,
+      "tests": 291,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/ui",
+      "suites": 22,
+      "tests": 152,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/app",
+      "suites": 5,
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "gradleExitCode": 0,
+  "result": "BUILD SUCCESSFUL in 1m 13s",
+  "tasks": "182 actionable tasks: 182 executed",
+  "earlierExportFailure": "Only the exported BlockGateTest masked-VIN expectation was stale after replacing a real VIN; fixed in upload copy, then all eight modules rerun. Original product source/APK unchanged.",
+  "deviceAcceptance": false
+}

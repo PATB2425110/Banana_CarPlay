@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      OneOS 的方控能力挂在系统服务上，我们通过显式 ComponentName 去 bind。
+
+      显式 bindService 本身不要求包可见性，但 `PackageManager.resolveService()`
+      在 Android 11+ 上**要求**先声明 <queries>，否则一律返回 null。
+      本模块用 resolveService 做"这台车机到底有没有 OneOS"的能力探测
+      （见 EcarxCarInputAdapter.isSupported），所以必须声明。
+
+      `com.geely.online.service` 是另一件事：车机媒体卡片/仪表盘的数据由它渲染，
+      我们要把曲目"伪装成帆书"报给它的 `com.media.control.MediaControlReceiver`。
+      发广播本身不需要包可见性，但**能力探测**（`queryBroadcastReceivers`）
+      在 Android 11+ 上需要——否则在支持的车机上也会被判成"不支持"。
+
+      注意：库模块的 manifest 会 merge 进最终 APK，不会覆盖宿主清单。
+    -->
+    <queries>
+        <package android:name="com.geely.service.oneosapi" />
+        <package android:name="com.geely.mediacenterservice" />
+        <package android:name="com.geely.online.service" />
+    </queries>
+
+</manifest>

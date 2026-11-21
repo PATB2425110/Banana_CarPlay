@@ -1,0 +1,16 @@
+# 本地 MFi 配件身份：含**明文私钥**，绝不入库。
+#
+# 安装方式（二选一）：
+#   - 随包内置： .\scripts\install-mfi-identity.ps1 -FromApk <apk>
+#                .\scripts\install-mfi-identity.ps1 -FromDirectory <目录>
+#   - 运行时导入：设置页 → 链路 → MFi 认证 → 导入自定义身份
+#
+# 这份身份属于它的合法持有者（Apple 签发给具体配件厂商），
+# 不要提交进仓库，也不要随公开发行版分发。
+#
+# 为什么规则放在 car/ 里而不是仓库根的 .gitignore：
+# 根 .gitignore 是上游被跟踪的文件，改它会多出一处上游偏离，
+# 每次 merge upstream 都可能冲突。car/ 整棵树都是二开层，放这里不碰上游。
+
+app/src/main/assets/offline-mfi/
+*.pk8
