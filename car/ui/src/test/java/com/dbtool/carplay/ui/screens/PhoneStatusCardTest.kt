@@ -78,12 +78,13 @@ class PhoneStatusCardTest {
         assertTrue(settings.contains("settings.copy(immersiveGlassColor ="))
         assertTrue(settings.contains("settings.copy(immersiveGlassTransparency ="))
     }
-    @Test fun twoRightAlignedRowsUseExactRequestedScalesInsideNavigation() {
+    @Test fun threeRightAlignedRowsMatchSignalToBatteryWidthAndStayAboveLanes() {
         val row = GlassPhoneStatusLayout
-        assertEquals(0.7f, row.SIGNAL_SCALE, 0f)
+        assertEquals(49.6f / 102f, row.SIGNAL_SCALE, 0.0001f)
         assertEquals(0.8f, row.BATTERY_SCALE, 0f)
-        assertEquals(71.4f, row.SIGNAL_WIDTH * row.SIGNAL_SCALE, 0.0001f)
-        assertEquals(29.4f, row.SIGNAL_HEIGHT * row.SIGNAL_SCALE, 0.0001f)
+        assertEquals(49.6f, row.SIGNAL_WIDTH * row.SIGNAL_SCALE, 0.0001f)
+        assertEquals(row.ICON_WIDTH, row.SIGNAL_WIDTH * row.SIGNAL_SCALE, 0.0001f)
+        assertEquals(20.42353f, row.SIGNAL_HEIGHT * row.SIGNAL_SCALE, 0.0001f)
         assertEquals(44.8f, row.BATTERY_WIDTH * row.BATTERY_SCALE, 0.0001f)
         assertEquals(24f, row.BATTERY_HEIGHT * row.BATTERY_SCALE, 0.0001f)
         assertEquals(25.6f, row.VALUE_TEXT_SIZE * row.BATTERY_SCALE, 0.0001f)
@@ -92,22 +93,28 @@ class PhoneStatusCardTest {
         val batteryTop = row.BATTERY_CENTER_Y - row.BATTERY_HEIGHT * row.BATTERY_SCALE / 2f
         assertTrue(row.SIGNAL_TOP > 0f)
         assertTrue(signalBottom < batteryTop)
-        assertTrue(row.BATTERY_CENTER_Y + row.BATTERY_HEIGHT * row.BATTERY_SCALE / 2f < 105f)
+        assertEquals(row.RIGHT, row.batteryLeft() +
+            (row.BATTERY_WIDTH + row.BATTERY_TERMINAL_EXTENT) * row.BATTERY_SCALE, 0.0001f)
+        assertTrue(row.BATTERY_CENTER_Y + row.BATTERY_HEIGHT * row.BATTERY_SCALE / 2f <
+            row.PERCENT_INK_BOTTOM - 26f)
+        assertEquals(64f, GlassLaneLayout.TOP - row.PERCENT_INK_BOTTOM, 0f)
         assertTrue(row.RIGHT < ImmersiveGlassCardLayout.WIDTH)
     }
-    @Test fun variablePercentageWidthKeepsWholeScaledBatteryGroupRightAlignedAndClearOfDistance() {
+    @Test fun percentageHasItsOwnRowWithStableRightEdgeAndDistanceReservation() {
         val row = GlassPhoneStatusLayout
         for (textWidth in listOf(40f, 55f, 70f, 88f)) {
-            val left = row.batteryLeft(textWidth)
-            val textLeft = row.batteryValueLeft(textWidth)
-            val right = textLeft + textWidth * row.BATTERY_SCALE
-            assertEquals(row.RIGHT, right, 0.0001f)
-            assertTrue(left > 370f)
-            assertEquals(row.BATTERY_VALUE_GAP * row.BATTERY_SCALE, textLeft -
-                (left + (row.BATTERY_WIDTH + row.BATTERY_TERMINAL_EXTENT) * row.BATTERY_SCALE), 0.0001f)
+            val inkRight = (textWidth * row.BATTERY_SCALE).toInt()
+            assertEquals(row.RIGHT, row.percentageTextLeft(inkRight) + inkRight, 0f)
             val distanceRight = ImmersiveGlassCardLayout.INSTRUCTION_LEFT + row.distanceMaxWidth(textWidth)
-            assertEquals(row.DISTANCE_GAP, minOf(left, row.SIGNAL_LEFT) - distanceRight, 0.0001f)
+            assertEquals(row.DISTANCE_GAP, minOf(row.SIGNAL_LEFT, row.RIGHT - textWidth * row.BATTERY_SCALE) -
+                distanceRight, 0.0001f)
         }
+        val s = source("car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt")
+        val status = s.substringAfter("private fun drawPhoneStatus(").substringBefore("/** Empty state")
+        assertTrue(status.contains("GlassPhoneStatusLayout.batteryLeft()"))
+        assertTrue(status.contains("GlassPhoneStatusLayout.percentageTextLeft(ink.right)"))
+        assertTrue(status.contains("GlassPhoneStatusLayout.PERCENT_INK_BOTTOM - ink.bottom"))
+        assertFalse(status.contains("BATTERY_VALUE_GAP"))
     }
     @Test fun arrowAlignmentMeasuresRasterInkAndRoadTextNotJustDrawableBounds() {
         val s = source("car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt")
@@ -127,8 +134,10 @@ class PhoneStatusCardTest {
         val settings = source("car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt")
         assertTrue(settings.contains("title = \"液态玻璃导航与音乐卡片\""))
         assertTrue(settings.contains("完整双卡需要至少662像素高度"))
-        assertTrue(settings.contains("信号0.7倍"))
-        assertTrue(settings.contains("百分比0.8倍"))
+        assertTrue(settings.contains("百分比三行右对齐"))
+        assertTrue(settings.contains("信号与电池图标同宽"))
+        assertTrue(settings.contains("车道行不下移"))
+        assertTrue(settings.contains("与大转向指示相同的实心箭头"))
         assertFalse(settings.contains("手机卡550×100"))
         assertFalse(settings.contains("全部卡片需要至少797"))
     }

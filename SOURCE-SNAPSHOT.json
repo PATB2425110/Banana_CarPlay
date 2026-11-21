@@ -4386,9 +4386,9 @@
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/GlassLaneGeometry.kt",
-      "bytes": 1227,
-      "sourceSHA256": "7A2FE0B67BDB744A93857C4EB5A1E88D4CD4DC4FCAA8724B5947CC5CAF5F3472",
-      "sha256": "7A2FE0B67BDB744A93857C4EB5A1E88D4CD4DC4FCAA8724B5947CC5CAF5F3472",
+      "bytes": 3104,
+      "sourceSHA256": "05A8161DE0FE85D2145C9B12C6B2F51FFDCD3B2681F99B9D2F09DF1BAB46B638",
+      "sha256": "05A8161DE0FE85D2145C9B12C6B2F51FFDCD3B2681F99B9D2F09DF1BAB46B638",
       "unchangedBytes": true
     },
     {
@@ -4421,16 +4421,16 @@
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardLayout.kt",
-      "bytes": 7635,
-      "sourceSHA256": "1E0C5B7C352EA1E293490C12A7DE9FF58F5CE286375FF954500A38846FAA43D9",
-      "sha256": "1E0C5B7C352EA1E293490C12A7DE9FF58F5CE286375FF954500A38846FAA43D9",
+      "bytes": 7670,
+      "sourceSHA256": "358927729D5F2ED73E579A06EE2A975FF95B5222388FABF81388651953201B73",
+      "sha256": "358927729D5F2ED73E579A06EE2A975FF95B5222388FABF81388651953201B73",
       "unchangedBytes": true
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt",
-      "bytes": 20380,
-      "sourceSHA256": "8C76FC6BCD9FF9EC28E5DC1EBB141EE1D837CBC51C3A70E61C097B4924B827B5",
-      "sha256": "8C76FC6BCD9FF9EC28E5DC1EBB141EE1D837CBC51C3A70E61C097B4924B827B5",
+      "bytes": 22821,
+      "sourceSHA256": "86931F2D751ECDCE19D617F35F74F605CA352A08A0ED7E23FAC1A924D7F52F7C",
+      "sha256": "86931F2D751ECDCE19D617F35F74F605CA352A08A0ED7E23FAC1A924D7F52F7C",
       "unchangedBytes": true
     },
     {
@@ -4463,16 +4463,16 @@
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/OsnNavigationIcons.kt",
-      "bytes": 1493,
-      "sourceSHA256": "5D0624FCCD2C2F6F7ED9A655907342F63CBDC92F913CC746753C8392AB2EB99B",
-      "sha256": "5D0624FCCD2C2F6F7ED9A655907342F63CBDC92F913CC746753C8392AB2EB99B",
+      "bytes": 1971,
+      "sourceSHA256": "B9308658E47FF428A8F5A05DE6C457E1E0D16F9A4CC57ECB7301B680B188A298",
+      "sha256": "B9308658E47FF428A8F5A05DE6C457E1E0D16F9A4CC57ECB7301B680B188A298",
       "unchangedBytes": true
     },
     {
       "path": "car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt",
-      "bytes": 193434,
-      "sourceSHA256": "7AFBA053ABD478D57E69117E1F2406EE788755D17C147DA090C35126992DFF78",
-      "sha256": "7AFBA053ABD478D57E69117E1F2406EE788755D17C147DA090C35126992DFF78",
+      "bytes": 193581,
+      "sourceSHA256": "1DBD5333C7A46B5A8C9DF537F61A7E5095535844F97DF7BE3EBCB5D54335B525",
+      "sha256": "1DBD5333C7A46B5A8C9DF537F61A7E5095535844F97DF7BE3EBCB5D54335B525",
       "unchangedBytes": true
     },
     {
@@ -4694,9 +4694,9 @@
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/GlassLaneGeometryTest.kt",
-      "bytes": 1048,
-      "sourceSHA256": "1F34000924125F74930DEDC8D1712697805A0F38701A2AD5D6AFB2F2C36594C6",
-      "sha256": "1F34000924125F74930DEDC8D1712697805A0F38701A2AD5D6AFB2F2C36594C6",
+      "bytes": 4060,
+      "sourceSHA256": "2C0B248C1AADD8A8930E1B0EA7FBF1BE345BC4C7BC7DAAD3C098C88D2FF06177",
+      "sha256": "2C0B248C1AADD8A8930E1B0EA7FBF1BE345BC4C7BC7DAAD3C098C88D2FF06177",
       "unchangedBytes": true
     },
     {
@@ -4743,9 +4743,9 @@
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardsTest.kt",
-      "bytes": 8481,
-      "sourceSHA256": "FABF4940262AFE4DCFFFB6463075E01742FF3AB6CC4F4489A8999772E95C2799",
-      "sha256": "FABF4940262AFE4DCFFFB6463075E01742FF3AB6CC4F4489A8999772E95C2799",
+      "bytes": 9267,
+      "sourceSHA256": "533C2D5D787E75CD3882AB238AD72D4934F1C14690174AFD2C5DF762BA9A178B",
+      "sha256": "533C2D5D787E75CD3882AB238AD72D4934F1C14690174AFD2C5DF762BA9A178B",
       "unchangedBytes": true
     },
     {
@@ -4764,16 +4764,16 @@
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/OsnNavigationIconsTest.kt",
-      "bytes": 1669,
-      "sourceSHA256": "1F45EAC706BC9025088C4C30AD76E7E6AE93B4AA110C95CA529D57C1AC2F7848",
-      "sha256": "1F45EAC706BC9025088C4C30AD76E7E6AE93B4AA110C95CA529D57C1AC2F7848",
+      "bytes": 2205,
+      "sourceSHA256": "1B3C75D57484B93608E23F84A7D94A4E376B9B75BB9CF713165110FA5880A90C",
+      "sha256": "1B3C75D57484B93608E23F84A7D94A4E376B9B75BB9CF713165110FA5880A90C",
       "unchangedBytes": true
     },
     {
       "path": "car/ui/src/test/java/com/dbtool/carplay/ui/screens/PhoneStatusCardTest.kt",
-      "bytes": 8453,
-      "sourceSHA256": "38C3ACFF17A0312A4BFF7DD4A9FA8E7B3B847B1B5E30DE5DA5B4584E89C2B160",
-      "sha256": "38C3ACFF17A0312A4BFF7DD4A9FA8E7B3B847B1B5E30DE5DA5B4584E89C2B160",
+      "bytes": 9245,
+      "sourceSHA256": "7313C3960E6A11809627C8B58C7E9AFF9BAC0712480C6AA22CB9BBD68DAFBAAF",
+      "sha256": "7313C3960E6A11809627C8B58C7E9AFF9BAC0712480C6AA22CB9BBD68DAFBAAF",
       "unchangedBytes": true
     },
     {
@@ -7077,6 +7077,28 @@
       "tag": "v1.4.2-375-202611212006",
       "tests": {
         "tests": 2472,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "noPrivateDiagnosticsOrSigningMaterial": true
+    },
+    {
+      "kind": "UI-only three-row status, large-arrow lane resources and centered music glyph",
+      "sourceFiles": [
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/GlassLaneGeometry.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardLayout.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/OsnNavigationIcons.kt",
+        "car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/GlassLaneGeometryTest.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardsTest.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/OsnNavigationIconsTest.kt",
+        "car/ui/src/test/java/com/dbtool/carplay/ui/screens/PhoneStatusCardTest.kt"
+      ],
+      "tag": "v1.4.2-375-202611212038",
+      "tests": {
+        "tests": 2477,
         "failures": 0,
         "errors": 0,
         "skipped": 0

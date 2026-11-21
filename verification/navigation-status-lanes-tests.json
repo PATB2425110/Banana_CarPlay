@@ -1,0 +1,90 @@
+{
+  "scope": "Eight-module local JVM tests; no Android pixel/vehicle acceptance.",
+  "totals": {
+    "tests": 2477,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "modules": [
+    {
+      "module": "shared",
+      "suites": 68,
+      "tests": 469,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/api",
+      "suites": 8,
+      "tests": 153,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/core-bridge",
+      "suites": 159,
+      "tests": 1311,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-android",
+      "suites": 1,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-ecarx",
+      "suites": 7,
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-geely",
+      "suites": 39,
+      "tests": 291,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/ui",
+      "suites": 22,
+      "tests": 161,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/app",
+      "suites": 5,
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "buildResult": "BUILD SUCCESSFUL in 1m 28s",
+  "tasks": "182 actionable tasks: 182 executed",
+  "exitCode": 0,
+  "changedSourceFiles": [
+    "car/ui/src/main/java/com/dbtool/carplay/ui/screens/GlassLaneGeometry.kt",
+    "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardLayout.kt",
+    "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt",
+    "car/ui/src/main/java/com/dbtool/carplay/ui/screens/OsnNavigationIcons.kt",
+    "car/ui/src/main/java/com/dbtool/carplay/ui/screens/SettingsScreen.kt",
+    "car/ui/src/test/java/com/dbtool/carplay/ui/screens/GlassLaneGeometryTest.kt",
+    "car/ui/src/test/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCardsTest.kt",
+    "car/ui/src/test/java/com/dbtool/carplay/ui/screens/OsnNavigationIconsTest.kt",
+    "car/ui/src/test/java/com/dbtool/carplay/ui/screens/PhoneStatusCardTest.kt"
+  ],
+  "knownConnectionIssueNotFixed": "重要：请保持“读取车辆状态”关闭。当前车辆状态能力声明在已报告iPhone上会触发IdentificationRejected；本次仅调整UI，没有修复握手或自动兼容回退。用户已确认关闭后恢复连接。"
+}

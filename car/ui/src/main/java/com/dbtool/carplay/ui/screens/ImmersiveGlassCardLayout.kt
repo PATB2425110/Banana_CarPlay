@@ -50,42 +50,43 @@ internal object ImmersiveGlassCardLayout {
         if (measuredWidth > availableWidth && measuredWidth > 0f) {
             DISTANCE_TEXT_SIZE * (availableWidth / measuredWidth).coerceIn(0f, 1f)
         } else DISTANCE_TEXT_SIZE
+
+    /** Center the visible music glyph, including its font side bearing, inside the album frame. */
+    fun coverPlaceholderLeft(inkLeft: Int, inkRight: Int): Float =
+        COVER_LEFT + COVER_SIZE / 2f - (inkLeft + inkRight) / 2f
 }
 
-/** Two right-aligned rows INSIDE the navigation card, not a separate phone-status card. */
+/** Signal / battery icon / percentage: three right-aligned rows above the road and lane content. */
 internal object GlassPhoneStatusLayout {
     const val RIGHT = 518f
-    const val SIGNAL_TOP = 24f
-    const val SIGNAL_SCALE = 0.7f
+    const val SIGNAL_TOP = 20f
     const val BATTERY_SCALE = 0.8f
-    const val BATTERY_CENTER_Y = 78f
+    const val BATTERY_CENTER_Y = 60f
+    const val PERCENT_INK_BOTTOM = 100f
     const val CENTER_Y = 0f
     const val SIGNAL_STEP = 22f
     const val SIGNAL_BAR_WIDTH = 14f
     const val SIGNAL_WIDTH = SIGNAL_STEP * 4f + SIGNAL_BAR_WIDTH
     const val SIGNAL_HEIGHT = 42f
-    const val SIGNAL_LEFT = RIGHT - SIGNAL_WIDTH * SIGNAL_SCALE
     const val SIGNAL_BOTTOM = SIGNAL_HEIGHT
     const val BATTERY_WIDTH = 56f
     const val BATTERY_HEIGHT = 30f
     const val BATTERY_TERMINAL_EXTENT = 6f
-    const val BATTERY_VALUE_GAP = 14f
     const val VALUE_TEXT_SIZE = 32f
+    // Match the whole battery icon including its terminal; keep the signal's original aspect.
+    const val ICON_WIDTH = (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT) * BATTERY_SCALE
+    const val SIGNAL_SCALE = ICON_WIDTH / SIGNAL_WIDTH
+    const val SIGNAL_LEFT = RIGHT - ICON_WIDTH
 
     const val DISTANCE_GAP = 16f
 
-    fun batteryGroupWidth(valueTextWidth: Float): Float =
-        (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT + BATTERY_VALUE_GAP + valueTextWidth) * BATTERY_SCALE
+    fun batteryLeft(): Float = RIGHT - ICON_WIDTH
 
-    // Scale the icon, terminal, gap AND percentage as one group and keep its right edge stable.
-    fun batteryLeft(valueTextWidth: Float): Float =
-        RIGHT - batteryGroupWidth(valueTextWidth)
-
-    fun batteryValueLeft(valueTextWidth: Float): Float =
-        batteryLeft(valueTextWidth) + (BATTERY_WIDTH + BATTERY_TERMINAL_EXTENT + BATTERY_VALUE_GAP) * BATTERY_SCALE
+    fun percentageTextLeft(inkRight: Int): Float = RIGHT - inkRight
 
     fun distanceMaxWidth(valueTextWidth: Float): Float =
-        minOf(SIGNAL_LEFT, batteryLeft(valueTextWidth)) - DISTANCE_GAP - ImmersiveGlassCardLayout.INSTRUCTION_LEFT
+        minOf(SIGNAL_LEFT, RIGHT - valueTextWidth * BATTERY_SCALE) -
+            DISTANCE_GAP - ImmersiveGlassCardLayout.INSTRUCTION_LEFT
 }
 
 /** Convert the phone's mA value exactly to A, without locale commas or rounding. */

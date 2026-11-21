@@ -17,14 +17,24 @@ internal fun osnManeuverIcon(kind: ClusterManeuverKind?): Int? = when (kind) {
     else -> null
 }
 
-internal data class OsnLaneIcon(val resource: Int, val rotation: Float = 0f, val mirror: Boolean = false)
+internal data class OsnLaneIcon(
+    val resource: Int,
+    val mirror: Boolean = false,
+    val exactBearing: Int? = null,
+)
 
-/** Verified primary lane silhouettes; exact non-cardinal bearings retain their angle via rotation. */
+/** Reuse the LARGE maneuver resources, not the old rounded lane silhouettes. */
 internal fun osnLaneIcon(bearing: Int): OsnLaneIcon? = when (val angle = glassLaneBearing(bearing)) {
     null -> null
-    0 -> OsnLaneIcon(R.drawable.osn_lane_0)
-    -90 -> OsnLaneIcon(R.drawable.osn_lane_1)
-    90 -> OsnLaneIcon(R.drawable.osn_lane_3)
-    else -> if (abs(angle) >= 155) OsnLaneIcon(R.drawable.osn_lane_5, mirror = angle > 0)
-        else OsnLaneIcon(R.drawable.osn_lane_0, rotation = angle.toFloat())
+    0 -> OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.STRAIGHT)))
+    -90 -> OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.LEFT)))
+    90 -> OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.RIGHT)))
+    -45 -> OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.KEEP_LEFT)))
+    45 -> OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.KEEP_RIGHT)))
+    else -> if (abs(angle) >= 155) {
+        OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.UTURN)), mirror = angle > 0)
+    } else {
+        // Do not round an unusual phone bearing to left/right/straight or rotate its whole stem.
+        OsnLaneIcon(requireNotNull(osnManeuverIcon(ClusterManeuverKind.STRAIGHT)), exactBearing = angle)
+    }
 }

@@ -7,6 +7,8 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
@@ -88,7 +90,7 @@ internal fun ImmersiveGlassCards(model: CarUiModel, actions: CarUiActions) {
                         val batteryTextWidth = phoneStatusPaint(Paint.Align.LEFT, Color.WHITE)
                             .measureText(glassPhoneBatteryText(model.phonePowerLevel))
                         distanceText(c, navigation.distance, GlassPhoneStatusLayout.distanceMaxWidth(batteryTextWidth))
-                        drawLanes(c, glassLanes(model.navigation))
+                        drawLanes(c, glassLanes(model.navigation), icons)
                         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x30ffffff }
                         c.drawLine(32f, 225f, 518f, 225f, p)
                         text(c, navigation.remaining, 32f, 270f, 24f, 320f)
@@ -120,7 +122,7 @@ internal fun ImmersiveGlassCards(model: CarUiModel, actions: CarUiActions) {
                             c.clipPath(Path().apply { addRoundRect(cover, 12f, 12f, Path.Direction.CW) })
                             c.drawBitmap(bitmap, null, cover, p.apply { alpha = 255 })
                             c.restoreToCount(save)
-                        } else text(c, "♪", 68f, 101f, 46f, 50f)
+                        } else drawMusicPlaceholder(c)
                         text(c, music?.title?.takeIf { it.isNotBlank() } ?: "暂无音乐",
                             ImmersiveGlassCardLayout.MUSIC_TEXT_LEFT, 76f, 29f, 360f)
                         text(c, listOfNotNull(music?.artist?.takeIf(String::isNotBlank),
@@ -181,15 +183,19 @@ private fun drawPhoneStatus(c: Canvas, model: CarUiModel) {
     val batteryText = glassPhoneBatteryText(model.phonePowerLevel)
     val batteryColor = if (glassPhoneBatteryFill(model.phonePowerLevel) == null) 0xff888888.toInt()
         else glassPhonePowerColor(model.phonePowerLevel, model.phoneChargingState)
-    val batteryTextWidth = phoneStatusPaint(Paint.Align.LEFT, batteryColor).measureText(batteryText)
     val batterySave = c.save()
-    c.translate(GlassPhoneStatusLayout.batteryLeft(batteryTextWidth), GlassPhoneStatusLayout.BATTERY_CENTER_Y)
+    c.translate(GlassPhoneStatusLayout.batteryLeft(), GlassPhoneStatusLayout.BATTERY_CENTER_Y)
     c.scale(GlassPhoneStatusLayout.BATTERY_SCALE, GlassPhoneStatusLayout.BATTERY_SCALE)
     drawPhoneBattery(c, model.phonePowerLevel, model.phoneChargingState, 0f)
-    phoneStatusText(c, batteryText,
-        GlassPhoneStatusLayout.BATTERY_WIDTH + GlassPhoneStatusLayout.BATTERY_TERMINAL_EXTENT +
-            GlassPhoneStatusLayout.BATTERY_VALUE_GAP, Paint.Align.LEFT, batteryColor)
     c.restoreToCount(batterySave)
+    // Draw the percentage in its own row. Align the visible glyph's right/bottom, not its advance.
+    val percentage = phoneStatusPaint(Paint.Align.LEFT, batteryColor).apply {
+        textSize *= GlassPhoneStatusLayout.BATTERY_SCALE
+    }
+    val ink = Rect()
+    percentage.getTextBounds(batteryText, 0, batteryText.length, ink)
+    c.drawText(batteryText, GlassPhoneStatusLayout.percentageTextLeft(ink.right),
+        GlassPhoneStatusLayout.PERCENT_INK_BOTTOM - ink.bottom, percentage)
 }
 
 private fun drawPhoneBattery(c: Canvas, level: Int?, chargingState: Int?, left: Float) {
@@ -244,11 +250,15 @@ private fun drawNavigationWaiting(c: Canvas) {
     c.drawText("等待导航信息", 275f, baseline, p)
 }
 
-private fun phoneStatusText(c: Canvas, value: String, x: Float, align: Paint.Align, textColor: Int) {
-    val paint = phoneStatusPaint(align, textColor)
-    val metrics = paint.fontMetrics
-    val baseline = GlassPhoneStatusLayout.CENTER_Y - (metrics.ascent + metrics.descent) / 2f
-    c.drawText(value, x, baseline, paint)
+private fun drawMusicPlaceholder(c: Canvas) {
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textSize = 46f
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+    }
+    val ink = Rect()
+    paint.getTextBounds("♪", 0, 1, ink)
+    c.drawText("♪", ImmersiveGlassCardLayout.coverPlaceholderLeft(ink.left, ink.right), 101f, paint)
 }
 
 private fun phoneStatusPaint(align: Paint.Align, textColor: Int) =
@@ -260,45 +270,23 @@ private fun phoneStatusPaint(align: Paint.Align, textColor: Int) =
     }
 
 /** Fixed row below the road: never shifts when lane data is absent or arrives late. */
-private fun drawLanes(c: Canvas, lanes: List<GlassLane>) {
+private fun drawLanes(c: Canvas, lanes: List<GlassLane>, icons: OsnIconPainter) {
     if (lanes.isEmpty()) {
         return
     }
-    val slot = 326f / lanes.size
-    val scale = minOf(1f, (slot - 2f) / 42f)
+    val glyphs = lanes.flatMap { lane -> lane.bearings.mapNotNull(::osnLaneIcon) }
+    val maximumHalfWidth = glyphs.maxOfOrNull(icons::laneHalfWidth) ?: 0f
+    val scale = GlassLaneLayout.rowScale(lanes.size, maximumHalfWidth)
     lanes.forEachIndexed { index, lane ->
-        val save = c.save()
-        c.translate(188f + (index + 0.5f) * slot, 190f)
-        c.scale(scale, scale)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeWidth = 4.5f
-            strokeCap = Paint.Cap.ROUND
-            strokeJoin = Paint.Join.ROUND
-        }
-        val recommended = lane.highlight != null && lane.highlight in lane.bearings
-        if (lane.bearings.isNotEmpty()) {
-            paint.color = if (recommended) Color.WHITE else 0xff888888.toInt()
-            c.drawLine(0f, 22f, 0f, 4f, paint)
-        }
+        // Draw nonrecommended branches first. Every branch shares the same upright shaft anchor;
+        // the phone's highlighted branch draws last without shifting/changing any other bearing.
         lane.bearings.sortedBy { it == lane.highlight }.forEach { bearing ->
-            glassLaneBranch(bearing)?.let { branch ->
-                paint.color = if (bearing == lane.highlight) Color.WHITE else 0xff888888.toInt()
-                c.drawPath(Path().apply {
-                    moveTo(branch.start.x, branch.start.y)
-                    cubicTo(branch.control1.x, branch.control1.y, branch.control2.x,
-                        branch.control2.y, branch.tip.x, branch.tip.y)
-                }, paint)
-                val d = branch.heading
-                c.drawPath(Path().apply {
-                    moveTo(branch.tip.x - d.x * 7f - d.y * 5f, branch.tip.y - d.y * 7f + d.x * 5f)
-                    lineTo(branch.tip.x, branch.tip.y)
-                    lineTo(branch.tip.x - d.x * 7f + d.y * 5f, branch.tip.y - d.y * 7f - d.x * 5f)
-                }, paint)
+            osnLaneIcon(bearing)?.let { glyph ->
+                icons.drawLane(c, glyph, GlassLaneLayout.centerX(index, lanes.size), scale,
+                    if (bearing == lane.highlight) Color.WHITE else 0xff888888.toInt())
             }
         }
-        // Preserve spacing for empty/unknown lanes without drawing placeholder information.
-        c.restoreToCount(save)
+        // Keep empty/unknown lane slots, but never manufacture an arrow/recommendation for them.
     }
 }
 
@@ -355,27 +343,96 @@ private fun triangle(c: Canvas, x: Float, y: Float, right: Boolean, p: Paint) {
 }
 
 private class OsnIconPainter(private val context: Context) {
-    private data class Icon(val bitmap: Bitmap, val inkBottom: Int)
+    private data class Icon(val bitmap: Bitmap, val ink: GlassLaneInk) {
+        val inkBottom: Int get() = ink.bottom
+    }
     private val icons = HashMap<Int, Icon>()
+    private val exactAngleIcons = object : LinkedHashMap<Int, Icon>(24, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, Icon>?): Boolean = size > 24
+    }
+    private val lanePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val laneColors = mapOf(Color.WHITE to PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN),
+        0xff888888.toInt() to PorterDuffColorFilter(0xff888888.toInt(), PorterDuff.Mode.SRC_IN))
 
     fun drawBottomAligned(c: Canvas, resource: Int, left: Float, roadInkBottom: Float) {
-        val icon = icons.getOrPut(resource) {
-            val size = ImmersiveGlassCardLayout.ARROW_SIZE
-            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val icon = vectorIcon(resource)
+        c.drawBitmap(icon.bitmap, left,
+            ImmersiveGlassCardLayout.arrowTop(roadInkBottom, icon.inkBottom), null)
+    }
+
+    fun laneHalfWidth(glyph: OsnLaneIcon): Float = laneIcon(glyph).ink.halfWidth
+
+    fun drawLane(c: Canvas, glyph: OsnLaneIcon, centerX: Float, rowScale: Float, tint: Int) {
+        val icon = laneIcon(glyph)
+        val scale = icon.ink.scaleToLaneHeight * rowScale
+        val save = c.save()
+        c.translate(centerX, GlassLaneLayout.BOTTOM)
+        c.scale(if (glyph.mirror) -scale else scale, scale)
+        lanePaint.colorFilter = laneColors.getValue(tint)
+        c.drawBitmap(icon.bitmap, -icon.ink.stemCenterX, -icon.ink.bottom.toFloat(), lanePaint)
+        c.restoreToCount(save)
+    }
+
+    private fun laneIcon(glyph: OsnLaneIcon): Icon = glyph.exactBearing?.let { angle ->
+        exactAngleIcons.getOrPut(angle) { rasterIcon { canvas, _ -> drawExactLane(canvas, angle) } }
+    } ?: vectorIcon(glyph.resource)
+
+    private fun vectorIcon(resource: Int): Icon = icons.getOrPut(resource) {
+        rasterIcon { canvas, size ->
             val drawable = requireNotNull(context.getDrawable(resource)).mutate()
             drawable.setTint(Color.WHITE)
             drawable.setBounds(0, 0, size, size)
-            drawable.draw(Canvas(bitmap))
-            // The vector viewport contains transparent padding. Measure once per icon, not per
-            // frame, so the visible arrow/arrival glyph meets the road's actual glyph bottom.
-            val pixels = IntArray(size * size)
-            bitmap.getPixels(pixels, 0, size, 0, 0, size, size)
-            val lastRow = (size - 1 downTo 0).firstOrNull { y ->
-                (0 until size).any { x -> (pixels[y * size + x] ushr 24) != 0 }
-            }
-            Icon(bitmap, lastRow?.plus(1) ?: size)
+            drawable.draw(canvas)
         }
-        c.drawBitmap(icon.bitmap, left,
-            ImmersiveGlassCardLayout.arrowTop(roadInkBottom, icon.inkBottom), null)
+    }
+
+    private fun rasterIcon(draw: (Canvas, Int) -> Unit): Icon {
+        val size = ImmersiveGlassCardLayout.ARROW_SIZE
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        draw(Canvas(bitmap), size)
+        // One alpha scan per cached vector/angle, never a screenshot or video-frame readback.
+        val pixels = IntArray(size * size)
+        bitmap.getPixels(pixels, 0, size, 0, 0, size, size)
+        var left = size
+        var top = size
+        var right = 0
+        var bottom = 0
+        for (y in 0 until size) for (x in 0 until size) {
+            if ((pixels[y * size + x] ushr 24) == 0) continue
+            left = minOf(left, x)
+            top = minOf(top, y)
+            right = maxOf(right, x + 1)
+            bottom = maxOf(bottom, y + 1)
+        }
+        if (bottom == 0) return Icon(bitmap, GlassLaneInk(0, 0, size, size, size / 2f))
+        val shaftRow = (bottom - 2).coerceAtLeast(top)
+        val shaft = (0 until size).filter { x -> (pixels[shaftRow * size + x] ushr 24) != 0 }
+        val stemCenter = if (shaft.isEmpty()) (left + right) / 2f else (shaft.first() + shaft.last() + 1) / 2f
+        return Icon(bitmap, GlassLaneInk(left, top, right, bottom, stemCenter))
+    }
+
+    private fun drawExactLane(c: Canvas, angle: Int) {
+        val branch = glassLaneBranch(angle) ?: return
+        c.translate(55f, 104f)
+        c.scale(1.4f, 1.4f)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0xe6ffffff.toInt()
+            style = Paint.Style.STROKE
+            strokeWidth = 8f
+            strokeCap = Paint.Cap.BUTT
+            strokeJoin = Paint.Join.MITER
+        }
+        c.drawPath(Path().apply {
+            moveTo(branch.start.x, branch.start.y)
+            lineTo(branch.bend.x, branch.bend.y)
+            lineTo(branch.neck.x, branch.neck.y)
+        }, paint)
+        paint.style = Paint.Style.FILL
+        c.drawPath(Path().apply {
+            branch.head.forEachIndexed { i, point ->
+                if (i == 0) moveTo(point.x, point.y) else lineTo(point.x, point.y)
+            }
+            close()
+        }, paint)
     }
 }

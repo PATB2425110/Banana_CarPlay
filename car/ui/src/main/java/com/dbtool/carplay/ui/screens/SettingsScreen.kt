@@ -2421,7 +2421,7 @@ private fun ImmersiveNavigationSettings(draft: CarSessionSettings, update: (CarS
             title = "液态玻璃导航与音乐卡片",
             checked = draft.immersiveGlassCardsEnabled,
             onCheckedChange = { update(draft.copy(immersiveGlassCardsEnabled = it)) },
-            description = "仅在沉浸111画面显示。导航550×300、音乐550×252物理像素，左距60、顶距75、间隔35，音乐卡顶部410。手机信号0.7倍、电池图标与百分比0.8倍，在导航卡右上角分两行显示；不再显示独立手机卡和取电电流。完整双卡需要至少662像素高度，小屏优先保留导航卡。两卡共用颜色与透明度，音乐与帆书上报同源，不更改苹果原生卡片或音频设置。",
+            description = "仅在沉浸111画面显示。导航550×300、音乐550×252物理像素，左距60、顶距75、间隔35，音乐卡顶部410。右上角按信号、电池图标、百分比三行右对齐；信号与电池图标同宽，电池与百分比仍为原尺寸0.8倍，车道行不下移。车道使用与大转向指示相同的实心箭头，保留各分支和推荐方向；不显示独立手机卡和取电电流。完整双卡需要至少662像素高度，小屏优先保留导航卡。两卡共用颜色与透明度，音乐与帆书上报同源，不更改苹果原生卡片或音频设置。",
         )
     }
     CarCard(modifier = Modifier.fillMaxWidth()) {

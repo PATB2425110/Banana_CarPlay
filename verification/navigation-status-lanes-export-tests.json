@@ -1,0 +1,70 @@
+{
+  "scope": "Sanitized public repository source, full eight-module rerun; not real-device visual acceptance",
+  "totals": {
+    "tests": 2477,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "modules": [
+    {
+      "module": "shared",
+      "tests": 469,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/api",
+      "tests": 153,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/core-bridge",
+      "tests": 1311,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-android",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-ecarx",
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/platform-geely",
+      "tests": 291,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/ui",
+      "tests": 161,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "car/app",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "result": "BUILD SUCCESSFUL in 43s",
+  "tasks": "182 actionable tasks: 182 executed",
+  "exitCode": 0
+}

@@ -20,14 +20,28 @@ class OsnNavigationIconsTest {
         assertNull(osnManeuverIcon(null))
         assertNull(osnManeuverIcon(ClusterManeuverKind.GENERIC))
     }
-    @Test fun verifiedLaneSilhouettesMatchCardinalBearings() {
-        assertEquals(R.drawable.osn_lane_0, osnLaneIcon(0)?.resource)
-        assertEquals(R.drawable.osn_lane_1, osnLaneIcon(-90)?.resource)
-        assertEquals(R.drawable.osn_lane_1, osnLaneIcon(270)?.resource)
-        assertEquals(R.drawable.osn_lane_3, osnLaneIcon(90)?.resource)
-        assertEquals(R.drawable.osn_lane_5, osnLaneIcon(-180)?.resource)
-        assertEquals(45f, osnLaneIcon(45)!!.rotation, 0f)
+    @Test fun laneDirectionsUseExactlyTheSameLargeManeuverResources() {
+        for ((bearing, kind) in listOf(
+            0 to ClusterManeuverKind.STRAIGHT,
+            -90 to ClusterManeuverKind.LEFT,
+            90 to ClusterManeuverKind.RIGHT,
+            -45 to ClusterManeuverKind.KEEP_LEFT,
+            45 to ClusterManeuverKind.KEEP_RIGHT,
+            -180 to ClusterManeuverKind.UTURN,
+        )) {
+            assertEquals(osnManeuverIcon(kind), osnLaneIcon(bearing)?.resource)
+            assertNull(osnLaneIcon(bearing)?.exactBearing)
+        }
+        assertEquals(osnLaneIcon(-90), osnLaneIcon(270))
+        assertEquals(osnLaneIcon(-45), osnLaneIcon(315))
         assertTrue(osnLaneIcon(170)!!.mirror)
+    }
+    @Test fun unusualValidLaneBearingKeepsExactAngleRatherThanUsingOldRoundedAsset() {
+        for (angle in listOf(-135, -30, 1, 30, 75, 135)) {
+            val icon = requireNotNull(osnLaneIcon(angle))
+            assertEquals(R.drawable.osn_navi_turn_front, icon.resource)
+            assertEquals(angle, icon.exactBearing)
+        }
     }
     @Test fun invalidLaneAnglesAreNotConvertedToStraight() {
         assertNull(osnLaneIcon(720))

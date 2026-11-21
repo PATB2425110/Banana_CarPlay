@@ -4,14 +4,14 @@
 
 ## 当前布局
 
-导航卡右上角两行手机信号／电量；独立手机卡取消，音乐卡上移到60/410。详细变更见[本次说明](docs/NAVIGATION-PHONE-INSET-20261121.md)。
+导航卡右上角信号／电池／百分比三行右对齐；车道复用大转向实心箭头，音乐占位水平居中。详细变更见[本次说明](docs/NAVIGATION-STATUS-LANES-20261121.md)。
 
 ## 当前交付
 
 - Apple CarPlay／`io.dushu.car`／1.4.2(code375)，原证书签名、未加固。
-- APK：`AppleCarPlay-1.4.2-375-202611212006.apk`（见本仓库Releases）。
-- SHA256：`304EF3835BCF843820B69735963A5DD269E98BF6A55918444C633B209E5CDB7E`。
-- 最新本地8模块JUnit：2472项，0失败／错误／跳过；详见`verification/navigation-phone-inset-tests.json`。
+- APK：`AppleCarPlay-1.4.2-375-202611212038.apk`（见本仓库Releases）。
+- SHA256：`1289D7E1A16A640151504F72F02445C1B9AC12B54E71AB727D8846CA57C8C6EA`。
+- 最新本地8模块JUnit：2477项，0失败／错误／跳过；详见`verification/navigation-status-lanes-tests.json`。
 - 燃油车Vehicle Status A100/A101/A102、独立通道lease、严格原车权限／有效性检查。
 - **重要：请保持“读取车辆状态”关闭。当前车辆状态能力声明在已报告iPhone上会触发IdentificationRejected；本次仅调整UI，没有修复握手或自动兼容回退。用户已确认关闭后恢复连接。**
 - 活跃读取未正常退出时下次启动保护性关闭，系统杀进程／断电也可能触发。不保证SDK不崩溃，不是实车验收。

@@ -92,6 +92,18 @@ class ImmersiveGlassCardsTest {
         assertEquals(300, ImmersiveGlassCardLayout.HEIGHT)
         assertEquals(252, ImmersiveGlassCardLayout.MUSIC_HEIGHT)
     }
+    @Test fun absentArtworkMusicGlyphIsCenteredByVisibleInkNotAdvanceOrFixedX() {
+        for ((left, right) in listOf(0 to 28, 3 to 31, -2 to 25)) {
+            val x = ImmersiveGlassCardLayout.coverPlaceholderLeft(left, right)
+            assertEquals(83f, x + (left + right) / 2f, 0f)
+        }
+        val root = generateSequence(java.io.File(".").canonicalFile) { it.parentFile }
+            .first { java.io.File(it, "shared/src/main").isDirectory }
+        val code = java.io.File(root, "car/ui/src/main/java/com/dbtool/carplay/ui/screens/ImmersiveGlassCards.kt").readText()
+        assertTrue(code.contains("} else drawMusicPlaceholder(c)"))
+        assertTrue(code.contains("coverPlaceholderLeft(ink.left, ink.right)"))
+        assertFalse(code.contains("\"♪\", 68f"))
+    }
     @Test fun newSwitchIsDefaultOffAndDoesNotRequireProtocolReconnect() {
         val old = CarSessionSettings.default()
         assertFalse(old.immersiveGlassCardsEnabled)
